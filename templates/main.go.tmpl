@@ -218,7 +218,7 @@ func executeQuery(tableName string, conectionName string, columns []string, qual
 		limit = int64(viper.GetInt("limit"))
 	}
 
-	queryContext := proto.NewQueryContext(columns, qualMap, limit)
+	queryContext := proto.NewQueryContext(columns, qualMap, limit, nil)
 	req := &proto.ExecuteRequest{
 		Table:                 tableName,
 		QueryContext:          queryContext,
