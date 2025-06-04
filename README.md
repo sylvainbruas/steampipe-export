@@ -10,27 +10,45 @@ You can use an installer that enables you to choose a plugin and download the ex
 
 ## Usage
 
-`steampipe_export_github -h`
+`steampipe_export_aws -h`
 
 ```bash
-Export data using the github plugin.
+Export data using the aws plugin.
 
 Find detailed usage information including table names, column names, and
-examples at the Steampipe Hub: https://hub.steampipe.io/plugins/turbot/github
+examples at the Steampipe Hub: https://hub.steampipe.io/plugins/turbot/aws
 
 Usage:
-  steampipe_export_github TABLE_NAME [flags]
+  steampipe_export_aws TABLE_NAME [flags]
 
 Flags:
-      --config string       Config file data
-  -h, --help                help for steampipe_export_github
-      --limit int           Limit data
+      --config string       Inline HCL config data for the connection  (deprecated - use --connection instead)
+      --config-dir string   Directory to read config files from (defaults to $STEAMPIPE_INSTALL_DIR/config)
+      --connection string   Name of the connection to use (must match a connection defined in the config file)
+  -h, --help                help for steampipe_export_aws
+      --limit int           Maximum number of rows to return (0 means no limit)
       --output string       Output format: csv, json or jsonl (default "csv")
-      --select strings      Column data to display
-      --where stringArray   where clause data
+      --select strings      Columns to include in the output
+  -v, --version             version for steampipe_export_aws
+      --where stringArray   Optional WHERE clause(s) to filter query results
 ```
 
 ## Examples
+
+### Export EC2 instances using a steampipe connection
+
+```bash
+./steampipe_export_aws aws_ec2_instance \
+  --connection=aws_prod
+```
+
+### Export EC2 instances using a steampipe connection from a steampipe install dir
+
+```bash
+./steampipe_export_aws aws_ec2_instance \
+  --connection=aws_prod \
+  --config-dir='/Users/jack/src/steampipe/config'
+```
 
 ### Export EC2 instances using an AWS profile
 
@@ -43,7 +61,7 @@ Flags:
 
 ```bash
 ./steampipe_export_aws aws_ec2_instance \
-  --config='profile="dundermifflin"' \
+  --connection=aws_prod \
   --where="instance_state='running'"
 ```
 
@@ -51,7 +69,7 @@ Flags:
 
 ```bash
 ./steampipe_export_aws aws_ec2_instance \
-  --config 'profile="dundermifflin"' \
+  --connection=aws_prod \
   --where "instance_state='running'" \
   --select "arn,instance_state"
 ```
@@ -60,7 +78,7 @@ Flags:
 
 ```bash
 ./steampipe_export_aws aws_ec2_instance \
-  --config 'profile="dundermifflin"' \
+  --connection=aws_prod \
   --where "instance_state='running'" \
   --select "arn,instance_state" \
   --limit 10
