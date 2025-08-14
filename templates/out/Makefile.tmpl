@@ -7,7 +7,12 @@ OS := $(shell uname)
 BUILD_TAGS = netgo
 
 # Function to fetch the version of the plugin
+# For v2+ plugins, we need to include the major version in the path
+{{- if .PluginVersion}}
+fetch_module_version = $(shell echo {{.PluginVersion}} | sed 's/^v//')
+{{- else}}
 fetch_module_version = $(shell go list -m -json github.com/turbot/steampipe-plugin-{{.Plugin}} | jq --raw-output '.Version | sub("^v"; "")')
+{{- end}}
 
 build:
 	$(eval VERSION=$(call fetch_module_version))
