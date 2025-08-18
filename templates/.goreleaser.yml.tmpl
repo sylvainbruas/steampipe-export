@@ -22,7 +22,7 @@ builds:
       - arm64
     ldflags:
       # strip debug info for smaller binaries
-      - "-s -w -X main.version={{"{{"}} .Env.VERSION {{"}}"}} -X main.date={{"{{"}} .Date {{"}}"}} -X main.commit={{"{{"}}.Commit {{"}}"}} -X main.builtBy=goreleaser"
+      - "-s -w -X main.version={{"{{"}} if .Env.VERSION {{"}}"}}{{"{{"}} .Env.VERSION {{"}}"}}{{"{{"}} else {{"}}"}}0.0.0{{"{{"}} end {{"}}"}} -X main.date={{"{{"}} .Date {{"}}"}} -X main.commit={{"{{"}} .Commit {{"}}"}} -X main.builtBy=goreleaser"
     flags:
       - -tags=netgo
 

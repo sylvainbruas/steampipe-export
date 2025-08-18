@@ -4,6 +4,20 @@
 # and then uses it in a GoReleaser snapshot release to ensure version consistency. This is needed since Goreleaser is 
 # run from the export repository and the version tag is pushed to the plugin repository.
 
-export VERSION=$(go list -m -json github.com/turbot/steampipe-plugin-{{.Plugin}} | jq --raw-output '.Version | sub("^v"; "")')
+# Try to get version from the module, handling all major versions
+# Extract major version from plugin version (e.g., v2.0.3 -> v2, v1.1.0 -> v1)
+{{ if .PluginVersion }}
+MAJOR_VERSION=$(echo {{.PluginVersion}} | grep -o '^v[0-9]\+' || echo "v1")
+if [ "$MAJOR_VERSION" = "v1" ] || [ "$MAJOR_VERSION" = "v0" ]; then
+    # For v1/v0 plugins, use base URL
+    export VERSION=$(go list -m -json {{.PluginGithubUrl}} 2>/dev/null | jq --raw-output '.Version | sub("^v"; "")' 2>/dev/null || echo "")
+else
+    # For v2+ plugins, use major version suffix
+    export VERSION=$(go list -m -json {{.PluginGithubUrl}}/$MAJOR_VERSION 2>/dev/null | jq --raw-output '.Version | sub("^v"; "")' 2>/dev/null || echo "")
+fi
+{{ else }}
+# No plugin version specified, try base URL
+export VERSION=$(go list -m -json {{.PluginGithubUrl}} 2>/dev/null | jq --raw-output '.Version | sub("^v"; "")' 2>/dev/null || echo "")
+{{ end }}
 echo "VERSION set to $VERSION"
 goreleaser release --snapshot --clean --skip=publish
